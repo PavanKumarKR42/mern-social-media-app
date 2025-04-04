@@ -1,0 +1,105 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Node.js
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# React/Vite/Next.js
+.next/
+.out/
+.vite/
+.vitepress/
+.eslintcache
+.npm/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+*.sqlite3
+db.sqlite3
+migrations/
+*.egg-info/
+
+# Django
+staticfiles/
+media/
+*.log
+*.pyc
+local_settings.py
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+target/
+bin/
+.gradle/
+.idea/
+
+# C++
+*.o
+*.out
+*.exe
+*.dSYM/
+*.vcxproj*
+*.xcodeproj*
+
+# Rust
+Cargo.lock
+target/
+
+# IDE / Editor-specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Git-related
+*.swp
+*.swo
+*.swn
+.gitignore.bak
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Secrets & Credentials
+*.pem
+*.p12
+*.key
+*.crt
+*.cert
+*.pfx
+
+# Miscellaneous
+*.zip
+*.tar.gz
+*.7z
+*.rar

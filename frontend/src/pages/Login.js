@@ -23,7 +23,7 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       toast.success("Login successful! Redirecting...");
       
-      navigate("/profile"); // ✅ Redirect user to the profile page
+      navigate("/feed"); // ✅ redirect to feed
     } catch (error) {
       console.error("Login error:", error);
       toast.error(error.response?.data?.message || "Invalid credentials");

@@ -1,7 +1,6 @@
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../utils/cloudinary");
-const path = require("path");
 
 // Ensure Cloudinary is configured
 if (!cloudinary || !cloudinary.uploader) {
@@ -14,17 +13,7 @@ const cloudinaryStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "mern-social-media/posts",
-        allowedFormats: ["jpg", "png", "jpeg"],
-    },
-});
-
-// Local disk storage configuration
-const localStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "uploads/"); // Save files in "uploads" directory
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+        allowed_formats: ["jpg", "png", "jpeg"], // Use allowed_formats instead of allowedFormats
     },
 });
 
@@ -38,12 +27,9 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Choose storage type based on environment
-const storageType = process.env.USE_CLOUDINARY === "true" ? cloudinaryStorage : localStorage;
-
-// Multer upload instance
+// Multer upload instance (Cloudinary only)
 const upload = multer({
-    storage: storageType,
+    storage: cloudinaryStorage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max size
     fileFilter: fileFilter,
 });

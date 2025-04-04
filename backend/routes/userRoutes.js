@@ -57,6 +57,18 @@ router.put("/follow/:userId", authMiddleware, followUser);
 router.put("/unfollow/:userId", authMiddleware, unfollowUser);
 
 // ✅ Get a specific user's profile
-router.get("/:userId", authMiddleware, getUserProfile);
+router.get("/:userId", authMiddleware, async (req, res) => {
+  try {
+    console.log("Fetching user with ID:", req.params.userId); // Debugging
+    const user = await User.findById(req.params.userId).select("-password");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 module.exports = router;

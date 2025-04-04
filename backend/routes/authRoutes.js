@@ -6,6 +6,23 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+// ✅ GET USER DATA - Authenticated user details
+router.get("/me", authMiddleware, async (req, res) => {
+  console.log("🔹 /me route accessed!"); // ✅ Debugging
+  try {
+    const user = await User.findById(req.user.id).select("-password"); // Exclude password
+    if (!user) {
+      console.log("❌ User not found");
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("❌ Error in /me:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+
 // ✅ REGISTER - Create New User
 router.post("/register", async (req, res) => {
     try {

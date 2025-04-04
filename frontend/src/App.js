@@ -4,7 +4,8 @@ import Login from "./pages/Login.js";
 import Signup from "./pages/Signup.js";
 import Home from "./pages/Home.js";
 import Profile from "./pages/Profile.js";
-
+import Feed from "./pages/Feed.js"; // ✅ Import Feed page
+import UserProfile from "./pages/UserProfile.js"; 
 import PrivateRoute from "./utils/PrivateRoute.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +23,9 @@ const App = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/feed" element={<Feed />} /> {/* ✅ Feed route */}
+          <Route path="/users/:userId" element={<UserProfile />} />
+
         </Route>
 
         {/* Handle 404 - Not Found */}

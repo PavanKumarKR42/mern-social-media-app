@@ -8,12 +8,21 @@ if (!cloudinary || !cloudinary.uploader) {
     process.exit(1);
 }
 
-// Cloudinary storage configuration
-const cloudinaryStorage = new CloudinaryStorage({
+// Cloudinary storage for Posts
+const postStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "mern-social-media/posts",
-        allowed_formats: ["jpg", "png", "jpeg"], // Use allowed_formats instead of allowedFormats
+        allowed_formats: ["jpg", "png", "jpeg"],
+    },
+});
+
+// Cloudinary storage for Profile Pictures
+const profileStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "mern-social-media/profiles",  // ✅ Separate folder for profiles
+        allowed_formats: ["jpg", "png", "jpeg"],
     },
 });
 
@@ -27,11 +36,20 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Multer upload instance (Cloudinary only)
-const upload = multer({
-    storage: cloudinaryStorage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max size
+// Multer instances
+const uploadPostImage = multer({
+    storage: postStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: fileFilter,
 });
 
-module.exports = upload;
+const uploadProfilePicture = multer({
+    storage: profileStorage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // ✅ Lower size limit for profile pics
+    fileFilter: fileFilter,
+});
+
+module.exports = {
+    uploadPostImage,
+    uploadProfilePicture
+};

@@ -85,23 +85,28 @@ const Feed = () => {
         <div key={post._id} style={styles.post}>
           <div style={styles.userInfo} onClick={() => handleUserClick(post.user._id)}>
             <img
-              src={`http://localhost:5000/${post.user.profilePicture}`}
+              src={post.user.profilePicture}
               alt="profile"
               style={styles.avatar}
               onError={(e) => {
-                e.target.src = "http://localhost:5000/uploads/default-profile.png";
+                e.target.src = "https://via.placeholder.com/150";
               }}
             />
             <strong style={styles.username}>{post.user.username}</strong>
           </div>
 
+          {/* ✅ Ensure post.image is a full Cloudinary URL */}
           {post.image && (
             <img
               src={post.image}
               alt="post"
               style={styles.postImage}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/300"; // Default placeholder
+              }}
             />
           )}
+
           <p>{post.text}</p>
 
           <div style={styles.actions}>

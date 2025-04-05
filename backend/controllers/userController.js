@@ -3,30 +3,29 @@ const User = require("../models/User");
 // Update User Profile
 exports.updateProfile = async (req, res) => {
     try {
-      console.log("Received file:", req.file); // ✅ Debugging log
-  
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
-      }
-  
-      const { username, bio } = req.body;
-      const user = await User.findById(req.user.id);
-      
-      if (!user) return res.status(404).json({ message: "User not found" });
-  
-      if (username) user.username = username;
-      if (bio) user.bio = bio;
-  
-      user.profilePicture = `/uploads/${req.file.filename}`;
-      await user.save();
-  
-      res.json({ message: "Profile updated successfully", user });
-    } catch (error) {
-      console.error("Upload error:", error);
-      res.status(500).json({ message: "Server Error" });
-    }
-  };
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
+        // Upload to Cloudinary if a new file is provided
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            user.profilePicture = result.secure_url; // Save Cloudinary URL
+        }
+
+        // Update other fields if provided
+        if (req.body.username) user.username = req.body.username;
+        if (req.body.bio) user.bio = req.body.bio;
+
+        await user.save();
+
+        res.json({ message: "Profile updated successfully", user });
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 // Follow a User
 exports.followUser = async (req, res) => {
     try {

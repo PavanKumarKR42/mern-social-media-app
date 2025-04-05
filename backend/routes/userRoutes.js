@@ -7,7 +7,8 @@ const {
 } = require("../controllers/userController");
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware"); // ✅ Import upload middleware
+const {uploadProfilePicture} = require("../middleware/uploadMiddleware"); // ✅ Import upload middleware
+const cloudinary = require("../utils/cloudinary"); // ✅ Import Cloudinary
 
 const router = express.Router();
 
@@ -23,9 +24,7 @@ router.get("/me", authMiddleware, async (req, res) => {
 });
 
 // ✅ Update Profile with Profile Picture
-router.put("/update", authMiddleware, upload.single("profilePicture"), async (req, res) => {
-  console.log("Received Data:", req.body);
-
+router.put("/update", authMiddleware, uploadProfilePicture.single("profilePicture"), async (req, res) => {
   try {
       const { username, bio } = req.body;
       const user = await User.findById(req.user.id);
@@ -36,10 +35,11 @@ router.put("/update", authMiddleware, upload.single("profilePicture"), async (re
 
       if (username) user.username = username;
       if (bio) user.bio = bio;
-      
-      // Check if a file was uploaded and update profile picture
+
+      // ✅ Correct Cloudinary URL assignment
       if (req.file) {
-        user.profilePicture = `/uploads/${req.file.filename}`; // Ensure correct path
+          const result = await cloudinary.uploader.upload(req.file.path); // Upload to Cloudinary
+          user.profilePicture = result.secure_url; // Store the secure Cloudinary URL
       }
 
       await user.save();

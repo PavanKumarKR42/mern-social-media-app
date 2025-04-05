@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api.js"; // Axios instance
 import { toast } from "react-toastify";
-import { jwtDecode } from "jwt-decode"; // ✅ Fixed import
+import { jwtDecode } from "jwt-decode";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -102,10 +102,10 @@ const Profile = () => {
       <p>Following: {stats.followingCount}</p>
       {user.profilePicture ? (
         <img 
-          src={`http://localhost:5000/${user.profilePicture}`} 
+          src={user.profilePicture} 
           alt="Profile" 
           style={styles.profileImage} 
-          onError={(e) => (e.target.src = "http://localhost:5000/uploads/default-profile.png")} 
+          onError={(e) => (e.target.src = "https://via.placeholder.com/100")}
         />
       ) : (
         <p>No profile picture</p>

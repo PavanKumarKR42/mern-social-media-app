@@ -8,7 +8,7 @@ const {
 } = require("../controllers/postController");
 const Post = require("../models/Post"); // ✅ Important
 const authMiddleware = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware");
+const { uploadPostImage } = require("../middleware/uploadMiddleware");
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.get("/user/:userId", authMiddleware, async (req, res) => {
 router.get("/:postId", authMiddleware, getPostById);
 
 // Create post
-router.post("/", authMiddleware, upload.single("image"), createPost);
+router.post("/", authMiddleware, uploadPostImage.single("image"), createPost);
 
 // All posts
 router.get("/", authMiddleware, getAllPosts);

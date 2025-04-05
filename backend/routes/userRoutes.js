@@ -55,6 +55,34 @@ router.put("/follow/:userId", authMiddleware, followUser);
 
 // ✅ Unfollow a user
 router.put("/unfollow/:userId", authMiddleware, unfollowUser);
+router.get("/search", async (req, res) => {
+  try {
+      const { username } = req.query; // ✅ Fix this
+      if (!username) {
+          return res.status(400).json({ message: "Search query is required" });
+      }
+
+      // Case-insensitive search
+      const users = await User.find({
+          username: { $regex: username, $options: "i" },
+      }).select("_id username profilePicture");
+
+      res.json(users);
+  } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/:userId/follow-stats", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("followers following");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ followersCount: user.followers.length, followingCount: user.following.length });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // ✅ Get a specific user's profile
 router.get("/:userId", authMiddleware, async (req, res) => {
@@ -70,5 +98,6 @@ router.get("/:userId", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
 
 module.exports = router;

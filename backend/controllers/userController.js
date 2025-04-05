@@ -30,53 +30,65 @@ exports.updateProfile = async (req, res) => {
 // Follow a User
 exports.followUser = async (req, res) => {
     try {
-        const userToFollow = await User.findById(req.params.userId);
-        const currentUser = await User.findById(req.user.id);
-
-        if (!userToFollow) return res.status(404).json({ message: "User not found" });
-
-        if (!currentUser.following.includes(userToFollow._id)) {
-            currentUser.following.push(userToFollow._id);
-            userToFollow.followers.push(currentUser._id);
-
-            await currentUser.save();
-            await userToFollow.save();
-
-            res.json({ message: "User followed", user: userToFollow });
-        } else {
-            res.status(400).json({ message: "Already following this user" });
-        }
+      const loggedInUserId = req.user.id; // ✅ Get logged-in user from token
+      const targetUserId = req.params.userId; // ✅ Get the user to be followed from URL param
+  
+      if (loggedInUserId === targetUserId) {
+        return res.status(400).json({ message: "You can't follow yourself." });
+      }
+  
+      const userToFollow = await User.findById(targetUserId);
+      const currentUser = await User.findById(loggedInUserId);
+  
+      if (!userToFollow || !currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // ✅ Check if already following
+      if (currentUser.following.includes(targetUserId)) {
+        return res.status(400).json({ message: "Already following this user." });
+      }
+  
+      // ✅ Use `$addToSet` to prevent duplicates
+      await User.findByIdAndUpdate(loggedInUserId, { $addToSet: { following: targetUserId } });
+      await User.findByIdAndUpdate(targetUserId, { $addToSet: { followers: loggedInUserId } });
+  
+      res.json({ message: "Followed successfully" });
     } catch (error) {
-        console.error("Error in followUser:", error.stack);
-        res.status(500).json({ message: "Server error", error: error.message || "Unknown error" });
+      console.error("Follow error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-};
-
+  };
+  
 // Unfollow a User
 exports.unfollowUser = async (req, res) => {
     try {
-        const userToUnfollow = await User.findById(req.params.userId);
-        const currentUser = await User.findById(req.user.id);
-
-        if (!userToUnfollow) return res.status(404).json({ message: "User not found" });
-
-        if (currentUser.following.includes(userToUnfollow._id)) {
-            currentUser.following = currentUser.following.filter(id => id.toString() !== userToUnfollow._id.toString());
-            userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString() !== currentUser._id.toString());
-
-            await currentUser.save();
-            await userToUnfollow.save();
-
-            res.json({ message: "User unfollowed", user: userToUnfollow });
-        } else {
-            res.status(400).json({ message: "You are not following this user" });
-        }
+      const loggedInUserId = req.user.id;
+      const targetUserId = req.params.userId;
+  
+      const userToUnfollow = await User.findById(targetUserId);
+      const currentUser = await User.findById(loggedInUserId);
+  
+      if (!userToUnfollow || !currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // ✅ Check if the user is actually following before trying to unfollow
+      if (!currentUser.following.includes(targetUserId)) {
+        return res.status(400).json({ message: "You are not following this user" });
+      }
+  
+      // ✅ Remove the target user from following list
+      await User.findByIdAndUpdate(loggedInUserId, { $pull: { following: targetUserId } });
+      await User.findByIdAndUpdate(targetUserId, { $pull: { followers: loggedInUserId } });
+  
+      res.json({ message: "Unfollowed successfully" });
     } catch (error) {
-        console.error("Error in unfollowUser:", error.stack);
-        res.status(500).json({ message: "Server error", error: error.message || "Unknown error" });
+      console.error("Unfollow error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-};
-
+  };
+  
 // Get User Profile
 exports.getUserProfile = async (req, res) => {
     try {

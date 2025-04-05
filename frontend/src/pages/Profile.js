@@ -9,6 +9,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
+  const [stats, setStats] = useState({ followersCount: 0, followingCount: 0 });
   const [formData, setFormData] = useState({ username: "", bio: "", profilePicture: null });
 
   useEffect(() => {
@@ -39,8 +40,10 @@ const Profile = () => {
         setUser(data);
         setFormData({ username: data.username, bio: data.bio || "", profilePicture: data.profilePicture });
 
-        console.log("Profile Picture Path:", data.profilePicture); // ✅ Debugging log
-
+        const followStats = await api.get(`/users/${userId}/follow-stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStats(followStats.data);
       } catch (error) {
         toast.error("Failed to load profile");
       } finally {
@@ -95,14 +98,14 @@ const Profile = () => {
     <div style={styles.container}>
       <h2>{user.username}'s Profile</h2>
       <p>Email: {user.email}</p>
-
-      {/* Profile Picture Display */}
+      <p>Followers: {stats.followersCount}</p>
+      <p>Following: {stats.followingCount}</p>
       {user.profilePicture ? (
         <img 
           src={`http://localhost:5000/${user.profilePicture}`} 
           alt="Profile" 
           style={styles.profileImage} 
-          onError={(e) => (e.target.src = "http://localhost:5000/uploads/default-profile.png")} // ✅ Fallback image
+          onError={(e) => (e.target.src = "http://localhost:5000/uploads/default-profile.png")} 
         />
       ) : (
         <p>No profile picture</p>
@@ -137,8 +140,6 @@ const Profile = () => {
             placeholder="Bio"
             style={styles.input}
           />
-          
-          {/* Profile Picture Upload Input */}
           <input
             type="file"
             name="profilePicture"
@@ -147,12 +148,8 @@ const Profile = () => {
             style={styles.input}
           />
 
-          <button onClick={handleUpdate} style={styles.saveButton}>
-            Save
-          </button>
-          <button onClick={() => setEditMode(false)} style={styles.cancelButton}>
-            Cancel
-          </button>
+          <button onClick={handleUpdate} style={styles.saveButton}>Save</button>
+          <button onClick={() => setEditMode(false)} style={styles.cancelButton}>Cancel</button>
         </div>
       )}
     </div>
@@ -161,61 +158,13 @@ const Profile = () => {
 
 const styles = {
   container: { textAlign: "center", padding: "20px" },
-  profileImage: {
-    width: "100px",
-    height: "100px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    marginBottom: "10px",
-  },
-  button: {
-    padding: "10px",
-    margin: "10px",
-    background: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  logoutButton: {
-    padding: "10px",
-    margin: "10px",
-    background: "red",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  modal: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-    display: "inline-block",
-  },
-  input: {
-    display: "block",
-    margin: "10px 0",
-    padding: "10px",
-    width: "100%",
-  },
-  saveButton: {
-    background: "green",
-    color: "white",
-    padding: "10px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  cancelButton: {
-    background: "gray",
-    color: "white",
-    padding: "10px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginLeft: "10px",
-  },
+  profileImage: { width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover", marginBottom: "10px" },
+  button: { padding: "10px", margin: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" },
+  logoutButton: { padding: "10px", margin: "10px", background: "red", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" },
+  modal: { background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)", display: "inline-block" },
+  input: { display: "block", margin: "10px 0", padding: "10px", width: "100%" },
+  saveButton: { background: "green", color: "white", padding: "10px", border: "none", borderRadius: "5px", cursor: "pointer" },
+  cancelButton: { background: "gray", color: "white", padding: "10px", border: "none", borderRadius: "5px", cursor: "pointer", marginLeft: "10px" },
 };
 
 export default Profile;

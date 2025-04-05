@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import CreatePost from "./CreatePost.js";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "./SearchBar.js"; // Import the SearchBar component
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -64,6 +65,9 @@ const Feed = () => {
 
   return (
     <div style={styles.container}>
+      {/* ✅ Add the Search Bar Here */}
+      <SearchBar />
+
       {/* 👤 My Profile button */}
       <div style={styles.header}>
         <button onClick={() => navigate("/profile")} style={styles.profileBtn}>

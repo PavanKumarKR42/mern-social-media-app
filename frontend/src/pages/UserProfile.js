@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import { toast } from "react-toastify";
-import { jwtDecode } from "jwt-decode"; // ✅ Import jwtDecode
+import { jwtDecode } from "jwt-decode";
 
 const UserProfile = () => {
   const { userId } = useParams();
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false); // Track API calls
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
 
-  // ✅ Get logged-in user's ID from token
+  // ✅ Get current user ID from token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -28,37 +32,61 @@ const UserProfile = () => {
     }
   }, [navigate]);
 
-  // ✅ Fetch user profile & posts when userId or currentUserId changes
+  // ✅ Fetch user profile and follow stats
   useEffect(() => {
-    if (currentUserId) {
+    if (userId) {
       fetchUserProfile();
+      fetchFollowStats();
     }
   }, [userId, currentUserId]);
 
+  // ✅ Fetch User Profile
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      // Fetch user details
       const userRes = await api.get(`/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Fetch posts
       const postsRes = await api.get(`/posts/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setUser(userRes.data);
       setPosts(postsRes.data);
-
-      // Ensure currentUserId is available before checking followers
-      if (currentUserId && userRes.data.followers) {
-        setIsFollowing(userRes.data.followers.includes(currentUserId));
-      }
+      setIsFollowing(userRes.data.followers.includes(currentUserId));
     } catch (err) {
       console.error("Error fetching user profile:", err.response?.data || err.message);
       toast.error("Failed to load profile");
+    }
+  };
+
+  // ✅ Fetch Followers & Following Count
+  const fetchFollowStats = async () => {
+    console.log("User ID in fetch function:", userId); // Debugging
+
+    if (!userId) {
+      console.error("Error: Invalid or missing User ID");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Fetch Followers
+      const followersRes = await api.get(`/users/${userId}/followers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch Following
+      const followingRes = await api.get(`/users/${userId}/following`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFollowers(followersRes.data);
+      setFollowing(followingRes.data);
+    } catch (error) {
+      console.error("Error fetching follow stats:", error);
     }
   };
 
@@ -73,12 +101,11 @@ const UserProfile = () => {
     try {
       const token = localStorage.getItem("token");
       const endpoint = isFollowing ? `/users/unfollow/${userId}` : `/users/follow/${userId}`;
-      
-      // ✅ Changed to PUT request (matches backend)
-      const { data } = await api.put(endpoint, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await api.put(endpoint, {}, { headers: { Authorization: `Bearer ${token}` } });
 
       setIsFollowing(!isFollowing);
-      toast.success(data.message);
+      toast.success(isFollowing ? "Unfollowed" : "Followed");
+      fetchFollowStats();
     } catch (error) {
       console.error("Error in follow/unfollow:", error);
       toast.error(error.response?.data?.message || "Something went wrong.");
@@ -103,6 +130,7 @@ const UserProfile = () => {
         <h2>{user.username}</h2>
         <p>{user.email}</p>
 
+        {/* Follow Button */}
         {currentUserId !== user._id && (
           <button
             onClick={handleFollowToggle}
@@ -121,35 +149,37 @@ const UserProfile = () => {
             {isFollowing ? "Unfollow" : "Follow"}
           </button>
         )}
-      </div>
 
-      <hr style={{ marginBottom: "20px" }} />
+        {/* Followers & Following */}
+        <div style={{ marginTop: "15px" }}>
+          <button onClick={() => setShowFollowers(!showFollowers)}>
+            Followers ({followers.length})
+          </button>
+          <button onClick={() => setShowFollowing(!showFollowing)} style={{ marginLeft: "10px" }}>
+            Following ({following.length})
+          </button>
+        </div>
 
-      <h3>📸 Posts</h3>
-      {posts.length > 0 ? (
-        posts.map((post) => (
-          <div
-            key={post._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              marginTop: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            {post.image && (
-              <img
-                src={post.image}
-                alt="post"
-                style={{ maxWidth: "100%", borderRadius: "6px", marginBottom: "10px" }}
-              />
-            )}
-            <p>{post.text}</p>
+        {/* Followers List */}
+        {showFollowers && (
+          <div>
+            <h4>Followers</h4>
+            {followers.length > 0 ? followers.map((follower) => (
+              <p key={follower._id}>{follower.username}</p>
+            )) : <p>No followers yet.</p>}
           </div>
-        ))
-      ) : (
-        <p>This user has not posted anything yet.</p>
-      )}
+        )}
+
+        {/* Following List */}
+        {showFollowing && (
+          <div>
+            <h4>Following</h4>
+            {following.length > 0 ? following.map((followee) => (
+              <p key={followee._id}>{followee.username}</p>
+            )) : <p>Not following anyone yet.</p>}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

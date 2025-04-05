@@ -73,6 +73,38 @@ router.get("/search", async (req, res) => {
       res.status(500).json({ message: "Server error" });
   }
 });
+
+router.get("/:userId/followers", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .populate("followers", "username profilePicture")
+      .select("followers");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user.followers);
+  } catch (error) {
+    console.error("Error fetching followers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ✅ Fetch Following List (Place it here)
+router.get("/:userId/following", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .populate("following", "username profilePicture")
+      .select("following");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user.following);
+  } catch (error) {
+    console.error("Error fetching following:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.get("/:userId/follow-stats", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).select("followers following");
@@ -83,7 +115,6 @@ router.get("/:userId/follow-stats", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 // ✅ Get a specific user's profile
 router.get("/:userId", authMiddleware, async (req, res) => {
   try {

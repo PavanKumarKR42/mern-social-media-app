@@ -108,12 +108,17 @@ const UserProfile = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.profileHeader}>
+    <div className="container mt-4">
+      <div className="text-center mb-4">
         <img
           src={user.profilePicture || "https://via.placeholder.com/150"}
           alt="profile"
-          style={styles.avatar}
+          className="rounded-circle"
+          style={{
+            width: "150px",
+            height: "150px",
+            objectFit: "cover",
+          }}
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/150";
           }}
@@ -125,60 +130,77 @@ const UserProfile = () => {
           <button
             onClick={handleFollowToggle}
             disabled={isProcessing}
-            style={{
-              ...styles.followBtn,
-              background: isFollowing ? "#ddd" : "#007bff",
-              color: isFollowing ? "#333" : "#fff",
-            }}
+            className={`btn ${isFollowing ? "btn-secondary" : "btn-primary"} mt-2`}
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </button>
         )}
 
-        <div style={styles.followStats}>
-          <button onClick={() => setShowFollowers(!showFollowers)}>
+        <div className="mt-3">
+          <button
+            className="btn btn-link"
+            onClick={() => setShowFollowers(!showFollowers)}
+          >
             Followers ({followers.length})
           </button>
-          <button onClick={() => setShowFollowing(!showFollowing)} style={{ marginLeft: "10px" }}>
+          <button
+            className="btn btn-link ml-3"
+            onClick={() => setShowFollowing(!showFollowing)}
+          >
             Following ({following.length})
           </button>
         </div>
 
         {showFollowers && (
-          <div>
+          <div className="mt-3">
             <h4>Followers</h4>
-            {followers.length > 0 ? followers.map((follower) => (
-              <p key={follower._id}>{follower.username}</p>
-            )) : <p>No followers yet.</p>}
+            {followers.length > 0 ? (
+              followers.map((follower) => <p key={follower._id}>{follower.username}</p>)
+            ) : (
+              <p>No followers yet.</p>
+            )}
           </div>
         )}
 
         {showFollowing && (
-          <div>
+          <div className="mt-3">
             <h4>Following</h4>
-            {following.length > 0 ? following.map((followee) => (
-              <p key={followee._id}>{followee.username}</p>
-            )) : <p>Not following anyone yet.</p>}
+            {following.length > 0 ? (
+              following.map((followee) => <p key={followee._id}>{followee.username}</p>)
+            ) : (
+              <p>Not following anyone yet.</p>
+            )}
           </div>
         )}
       </div>
 
-      <h3>Posts</h3>
+      {/* Center the "Posts" heading */}
+      <div className="text-center mb-3">
+        <h3>Posts</h3>
+      </div>
+
       {posts.length > 0 ? (
         posts.map((post) => (
-          <div key={post._id} style={styles.post}>
-            {/* Show image only if it exists */}
+          <div key={post._id} className="card mb-3" style={{ maxWidth: "500px", margin: "auto" }}>
             {post.image && (
               <img
                 src={post.image}
                 alt="post"
-                style={styles.postImage}
+                className="card-img-top"
+                style={{
+                  width: "100%", // Ensures the image spans the full width of the container
+                  height: "auto", // Keeps the aspect ratio intact
+                  objectFit: "cover", // Ensures the image covers the space without distortion
+                  maxHeight: "300px", // Limit height for a compact view
+                }}
                 onError={(e) => {
                   e.target.style.display = "none"; // Hide broken images
                 }}
               />
             )}
-            <p>{post.text}</p>
+            <div className="card-body">
+              <p>{post.text}</p>
+            </div>
           </div>
         ))
       ) : (
@@ -186,36 +208,6 @@ const UserProfile = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: { padding: "20px", maxWidth: "600px", margin: "auto" },
-  profileHeader: { textAlign: "center", marginBottom: "20px" },
-  avatar: {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-  followBtn: {
-    marginTop: "10px",
-    padding: "8px 16px",
-    borderRadius: "20px",
-    border: "none",
-    cursor: "pointer",
-  },
-  followStats: { marginTop: "15px" },
-  post: {
-    border: "1px solid #ccc",
-    padding: "15px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-  },
-  postImage: {
-    maxWidth: "100%",
-    borderRadius: "6px",
-    marginTop: "10px",
-  },
 };
 
 export default UserProfile;

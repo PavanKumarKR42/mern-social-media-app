@@ -28,61 +28,45 @@ const SearchBar = () => {
   };
 
   return (
-    <div style={styles.searchContainer}>
-      <input
-        type="text"
-        placeholder="Search users..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        style={styles.input}
-      />
-      <button onClick={handleSearch} style={styles.button}>🔍</button>
+    <div className="d-flex flex-column align-items-start mb-3 position-relative w-100">
+      <div className="d-flex w-100">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="form-control me-2"
+        />
+        <button onClick={handleSearch} className="btn btn-primary">
+          🔍
+        </button>
+      </div>
 
-      {/* Display search results */}
-      {searchResults.length > 0 && (
-        <ul style={styles.results}>
+      {/* Display search results dropdown */}
+      {searchResults.length > 0 && query.trim() && (
+        <div
+          className="dropdown-menu show w-100 mt-1"
+          style={{
+            position: "absolute",
+            zIndex: 999,
+            top: "100%",  // Position the dropdown right below the search input
+            left: 0,      // Align with the left of the search bar
+            width: "100%", // Match the width of the input
+          }}
+        >
           {searchResults.map((user) => (
-            <li key={user._id} onClick={() => handleUserClick(user._id)} style={styles.resultItem}>
+            <button
+              key={user._id}
+              onClick={() => handleUserClick(user._id)}
+              className="dropdown-item"
+            >
               {user.username}
-            </li>
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
-};
-
-const styles = {
-  searchContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-    marginBottom: "20px",
-  },
-  input: {
-    flex: 1,
-    padding: "8px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-  },
-  button: {
-    padding: "8px",
-    cursor: "pointer",
-    border: "none",
-    background: "#007bff",
-    color: "#fff",
-    borderRadius: "5px",
-  },
-  results: {
-    listStyle: "none",
-    padding: 0,
-    margin: "10px 0",
-  },
-  resultItem: {
-    padding: "8px",
-    cursor: "pointer",
-    borderBottom: "1px solid #ccc",
-  },
 };
 
 export default SearchBar;

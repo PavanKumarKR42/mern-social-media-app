@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api.js"; // Axios instance
+import api from "../utils/api.js";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 
@@ -92,79 +92,81 @@ const Profile = () => {
     navigate("/login");
   };
 
-  if (loading) return <h2>Loading...</h2>;
+  if (loading) return <h2 className="text-center mt-4">Loading...</h2>;
 
   return (
-    <div style={styles.container}>
-      <h2>{user.username}'s Profile</h2>
-      <p>Email: {user.email}</p>
-      <p>Followers: {stats.followersCount}</p>
-      <p>Following: {stats.followingCount}</p>
-      {user.profilePicture ? (
-        <img 
-          src={user.profilePicture} 
-          alt="Profile" 
-          style={styles.profileImage} 
-          onError={(e) => (e.target.src = "https://via.placeholder.com/100")}
-        />
-      ) : (
-        <p>No profile picture</p>
-      )}
+    <div className="container mt-5 text-center">
+      <div className="card p-4 shadow">
+        <h2>{user.username}'s Profile</h2>
+        <p className="text-muted">Email: {user.email}</p>
+        <p>Followers: {stats.followersCount}</p>
+        <p>Following: {stats.followingCount}</p>
 
-      <p>Bio: {user.bio || "No bio available"}</p>
+        {user.profilePicture ? (
+          <img
+            src={user.profilePicture}
+            alt="Profile"
+            className="rounded-circle mb-3 mx-auto d-block" // Centering the image and making it circular
+            style={{ width: "150px", height: "150px", objectFit: "cover" }} // Fixed width and height for circular shape
+            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+          />
+        ) : (
+          <p>No profile picture</p>
+        )}
 
-      <button onClick={() => setEditMode(true)} style={styles.button}>
-        Edit Profile
-      </button>
+        <p className="mb-3">Bio: {user.bio || "No bio available"}</p>
 
-      <button onClick={handleLogout} style={styles.logoutButton}>
-        Logout
-      </button>
+        <div className="d-flex justify-content-center gap-3">
+          <button className="btn btn-primary" onClick={() => setEditMode(true)}>
+            Edit Profile
+          </button>
+          <button className="btn btn-danger" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </div>
 
       {editMode && (
-        <div style={styles.modal}>
-          <h3>Edit Profile</h3>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            placeholder="Username"
-            style={styles.input}
-          />
-          <input
-            type="text"
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            placeholder="Bio"
-            style={styles.input}
-          />
-          <input
-            type="file"
-            name="profilePicture"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={styles.input}
-          />
+        <div className="modal-dialog mt-4">
+          <div className="modal-content p-4 shadow-sm">
+            <h4>Edit Profile</h4>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
+              className="form-control my-2"
+            />
+            <input
+              type="text"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              placeholder="Bio"
+              className="form-control my-2"
+            />
+            <input
+              type="file"
+              name="profilePicture"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="form-control my-2"
+            />
 
-          <button onClick={handleUpdate} style={styles.saveButton}>Save</button>
-          <button onClick={() => setEditMode(false)} style={styles.cancelButton}>Cancel</button>
+            <div className="d-flex justify-content-end gap-2">
+              <button className="btn btn-success" onClick={handleUpdate}>
+                Save
+              </button>
+              <button className="btn btn-secondary" onClick={() => setEditMode(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
-};
-
-const styles = {
-  container: { textAlign: "center", padding: "20px" },
-  profileImage: { width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover", marginBottom: "10px" },
-  button: { padding: "10px", margin: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" },
-  logoutButton: { padding: "10px", margin: "10px", background: "red", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" },
-  modal: { background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)", display: "inline-block" },
-  input: { display: "block", margin: "10px 0", padding: "10px", width: "100%" },
-  saveButton: { background: "green", color: "white", padding: "10px", border: "none", borderRadius: "5px", cursor: "pointer" },
-  cancelButton: { background: "gray", color: "white", padding: "10px", border: "none", borderRadius: "5px", cursor: "pointer", marginLeft: "10px" },
 };
 
 export default Profile;

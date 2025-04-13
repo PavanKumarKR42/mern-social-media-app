@@ -31,84 +31,42 @@ const Login = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.box}>
-        <h2 style={styles.heading}>Login</h2>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", background: "linear-gradient(135deg, #667eea, #764ba2)" }}>
+      <div className="card p-4 shadow" style={{ width: "300px" }}>
+        <h2 className="text-center mb-4">Login</h2>
+        
         <form onSubmit={handleLogin}>
-          <input 
-            type="email" 
-            placeholder="Email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            style={styles.input}
-          />
-          <input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            style={styles.input}
-          />
-          <button type="submit" style={styles.button}>Login</button>
+          <div className="mb-3">
+            <input 
+              type="email" 
+              className="form-control" 
+              placeholder="Email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <div className="mb-3">
+            <input 
+              type="password" 
+              className="form-control" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary w-100">Login</button>
         </form>
 
-        <p style={styles.signupText}>
-          Don't have an account? <Link to="/signup" style={styles.signupLink}>Sign up</Link>
+        <p className="mt-3 text-center">
+          Don't have an account? <Link to="/signup" className="text-primary fw-bold">Sign up</Link>
         </p>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "linear-gradient(135deg, #667eea, #764ba2)",
-  },
-  box: {
-    background: "white",
-    padding: "2rem",
-    borderRadius: "10px",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-    textAlign: "center",
-    width: "300px",
-  },
-  heading: {
-    color: "#333",
-    marginBottom: "1rem",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    margin: "8px 0",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#667eea",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1rem",
-  },
-  signupText: {
-    marginTop: "10px",
-    fontSize: "0.9rem",
-    color: "#555",
-  },
-  signupLink: {
-    color: "#667eea",
-    textDecoration: "none",
-    fontWeight: "bold",
-  },
 };
 
 export default Login;

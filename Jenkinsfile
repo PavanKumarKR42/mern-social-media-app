@@ -15,8 +15,8 @@ pipeline {
     stage('Build & Run Containers') {
       steps {
         script {
-          sh 'docker-compose down'
-          sh 'docker-compose up --build -d'
+          bat 'docker-compose down'
+          bat 'docker-compose up --build -d'
         }
       }
     }
@@ -25,7 +25,7 @@ pipeline {
   post {
     always {
       echo 'Cleaning up unused Docker resources...'
-      sh 'docker system prune -f'
+      bat 'docker system prune -f'
     }
   }
 }

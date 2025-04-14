@@ -18,11 +18,24 @@ pipeline {
             }
         }
 
+        stage('Free Port 5000') {
+            steps {
+                script {
+                    echo 'Checking and stopping any containers using port 5000...'
+                    bat '''
+                        for /f "tokens=*" %%i in ('docker ps -q --filter "publish=5000"') do (
+                            docker stop %%i
+                            docker rm %%i
+                        )
+                    '''
+                }
+            }
+        }
+
         stage('Build & Run Containers') {
             steps {
                 script {
-                    // Pass environment variables to docker-compose (if you want to inject them)
-                    bat 'docker-compose down'
+                    bat 'docker-compose down || exit 0'
                     bat 'docker-compose up --build -d'
                 }
             }

@@ -3,6 +3,12 @@ pipeline {
 
     environment {
         COMPOSE_FILE = 'docker-compose.yml'
+        MONGO_URI = credentials('MONGO_URI')
+        JWT_SECRET = credentials('JWT_SECRET')
+        USE_CLOUDINARY = credentials('USE_CLOUDINARY')
+        CLOUDINARY_CLOUD_NAME = credentials('CLOUDINARY_CLOUD_NAME')
+        CLOUDINARY_API_KEY = credentials('CLOUDINARY_API_KEY')
+        CLOUDINARY_API_SECRET = credentials('CLOUDINARY_API_SECRET')
     }
 
     stages {
@@ -12,30 +18,10 @@ pipeline {
             }
         }
 
-        stage('Load Environment Variables from Secrets') {
-            steps {
-                script {
-                    // Retrieve the credentials stored in Jenkins and split them into environment variables
-                    def secretEnvVars = credentials('my-env-vars')
-                    
-                    def envVars = secretEnvVars.split('\n')
-                    envVars.each { line ->
-                        if (line.trim()) {
-                            def (key, value) = line.split('=')
-                            if (key && value) {
-                                // Set each environment variable dynamically for Docker Compose
-                                env[key.trim()] = value.trim()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Build & Run Containers') {
             steps {
                 script {
-                    // Run docker-compose with the environment variables loaded
+                    // Pass environment variables to docker-compose (if you want to inject them)
                     bat 'docker-compose down'
                     bat 'docker-compose up --build -d'
                 }

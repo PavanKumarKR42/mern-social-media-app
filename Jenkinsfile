@@ -18,14 +18,17 @@ pipeline {
             }
         }
 
-        stage('Free Port 5000') {
+        stage('Free Ports 5000 & 3000') {
             steps {
                 script {
-                    echo 'Checking and stopping any containers using port 5000...'
+                    echo 'Stopping any containers using ports 5000 or 3000...'
                     bat '''
-                        for /f "tokens=*" %%i in ('docker ps -q --filter "publish=5000"') do (
-                            docker stop %%i
-                            docker rm %%i
+                        for %%p in (5000 3000) do (
+                            for /f "tokens=*" %%i in ('docker ps -q --filter "publish=%%p"') do (
+                                echo Stopping container using port %%p...
+                                docker stop %%i
+                                docker rm %%i
+                            )
                         )
                     '''
                 }

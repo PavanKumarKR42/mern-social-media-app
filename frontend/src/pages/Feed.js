@@ -75,7 +75,7 @@ const Feed = () => {
         </button>
       </div>
 
-      <h2>📸 Lates Posts</h2>
+      <h2>📸 Latest Posts</h2>
 
       {/* CreatePost Component */}
       <CreatePost onPostCreated={() => fetchPosts(localStorage.getItem("token"))} />

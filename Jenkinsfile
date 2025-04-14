@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Clone Repository') {
       steps {
-        git url: 'https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git', branch: 'main'
+        git url: 'https://github.com/PavanKumarKR42/mern-social-media-app.git', branch: 'main'
       }
     }
 

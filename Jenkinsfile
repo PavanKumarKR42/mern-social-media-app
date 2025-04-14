@@ -3,6 +3,12 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.yml'
+    MONGO_URI = credentials('mongo-uri') // Use Jenkins credentials for sensitive data
+    JWT_SECRET = credentials('jwt-secret')
+    USE_CLOUDINARY = credentials('use-cloudinary')
+    CLOUDINARY_CLOUD_NAME = credentials('cloudinary-cloud-name')
+    CLOUDINARY_API_KEY = credentials('cloudinary-api-key')
+    CLOUDINARY_API_SECRET = credentials('cloudinary-api-secret')
   }
 
   stages {
@@ -15,6 +21,7 @@ pipeline {
     stage('Build & Run Containers') {
       steps {
         script {
+          // Ensure the correct environment variables are passed to docker-compose
           bat 'docker-compose down'
           bat 'docker-compose up --build -d'
         }

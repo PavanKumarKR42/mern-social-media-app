@@ -16,5 +16,10 @@ services:
       dockerfile: backend/Dockerfile
     ports:
       - "5000:5000"
-    env_file:
-      - backend/.env
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - USE_CLOUDINARY=${USE_CLOUDINARY}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}

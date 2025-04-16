@@ -16,6 +16,7 @@ const UserProfile = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -59,10 +60,7 @@ const UserProfile = () => {
   };
 
   const fetchFollowStats = async () => {
-    if (!userId) {
-      console.error("Error: Invalid or missing User ID");
-      return;
-    }
+    if (!userId) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -105,10 +103,23 @@ const UserProfile = () => {
     }
   };
 
+  const handleGoToFeed = () => {
+    navigate("/feed");
+  };
+
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 position-relative">
+      {/* Go to Feed Button */}
+      <button
+        className="btn btn-dark position-absolute"
+        style={{ top: "10px", right: "10px", zIndex: 1000 }}
+        onClick={handleGoToFeed}
+      >
+        Go to Feed
+      </button>
+
       <div className="text-center mb-4">
         <img
           src={user.profilePicture || "https://via.placeholder.com/150"}
@@ -118,7 +129,9 @@ const UserProfile = () => {
             width: "150px",
             height: "150px",
             objectFit: "cover",
+            cursor: "pointer",
           }}
+          onClick={() => setShowModal(true)}
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/150";
           }}
@@ -151,50 +164,104 @@ const UserProfile = () => {
           </button>
         </div>
 
+        {/* Followers Section */}
         {showFollowers && (
-          <div className="mt-3">
-            <h4>Followers</h4>
-            {followers.length > 0 ? (
-              followers.map((follower) => <p key={follower._id}>{follower.username}</p>)
-            ) : (
-              <p>No followers yet.</p>
-            )}
+  <div className="mt-3">
+    <h4>Followers</h4>
+    {followers.length > 0 ? (
+      <div className="d-flex flex-column align-items-center gap-3">
+        {followers.map((follower) => (
+          <div
+            key={follower._id}
+            className="card p-2 d-flex flex-row align-items-center"
+            style={{
+              width: "300px",
+              borderRadius: "10px",
+              gap: "15px",
+            }}
+          >
+            <img
+              src={follower.profilePicture || "https://via.placeholder.com/50"}
+              alt="Follower"
+              className="rounded-circle"
+              style={{ width: "50px", height: "50px", objectFit: "cover" }}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/50";
+              }}
+            />
+            <p className="mb-0">{follower.username}</p>
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      <p>No followers yet.</p>
+    )}
+  </div>
+)}
 
+
+        {/* Following Section */}
         {showFollowing && (
-          <div className="mt-3">
-            <h4>Following</h4>
-            {following.length > 0 ? (
-              following.map((followee) => <p key={followee._id}>{followee.username}</p>)
-            ) : (
-              <p>Not following anyone yet.</p>
-            )}
+  <div className="mt-3">
+    <h4>Following</h4>
+    {following.length > 0 ? (
+      <div className="d-flex flex-column align-items-center gap-3">
+        {following.map((followee) => (
+          <div
+            key={followee._id}
+            className="card p-2 d-flex flex-row align-items-center"
+            style={{
+              width: "300px",
+              borderRadius: "10px",
+              gap: "15px",
+            }}
+          >
+            <img
+              src={followee.profilePicture || "https://via.placeholder.com/50"}
+              alt="Following"
+              className="rounded-circle"
+              style={{ width: "50px", height: "50px", objectFit: "cover" }}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/50";
+              }}
+            />
+            <p className="mb-0">{followee.username}</p>
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      <p>Not following anyone yet.</p>
+    )}
+  </div>
+)}
+
       </div>
 
-      {/* Center the "Posts" heading */}
+      {/* Posts Section */}
       <div className="text-center mb-3">
         <h3>Posts</h3>
       </div>
 
       {posts.length > 0 ? (
         posts.map((post) => (
-          <div key={post._id} className="card mb-3" style={{ maxWidth: "500px", margin: "auto" }}>
+          <div
+            key={post._id}
+            className="card mb-3"
+            style={{ maxWidth: "500px", margin: "auto" }}
+          >
             {post.image && (
               <img
                 src={post.image}
                 alt="post"
                 className="card-img-top"
                 style={{
-                  width: "100%", // Ensures the image spans the full width of the container
-                  height: "auto", // Keeps the aspect ratio intact
-                  objectFit: "cover", // Ensures the image covers the space without distortion
-                  maxHeight: "300px", // Limit height for a compact view
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "cover",
+                  maxHeight: "300px",
                 }}
                 onError={(e) => {
-                  e.target.style.display = "none"; // Hide broken images
+                  e.target.style.display = "none";
                 }}
               />
             )}
@@ -204,7 +271,70 @@ const UserProfile = () => {
           </div>
         ))
       ) : (
-        <p>No posts yet.</p>
+        <p className="text-center">No posts yet.</p>
+      )}
+
+      {/* === Modal Popup for Full Size Profile Picture === */}
+      {showModal && (
+        <div
+          className="modal-backdrop"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            zIndex: 2000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              background: "#fff",
+              padding: "10px",
+              borderRadius: "10px",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              overflow: "auto",
+            }}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                position: "absolute",
+                top: "5px",
+                right: "10px",
+                fontSize: "1.5rem",
+                background: "transparent",
+                border: "none",
+                color: "#000",
+                cursor: "pointer",
+              }}
+            >
+              &times;
+            </button>
+            <img
+              src={user.profilePicture || "https://via.placeholder.com/500"}
+              alt="Full Size"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                borderRadius: "10px",
+              }}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/500";
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

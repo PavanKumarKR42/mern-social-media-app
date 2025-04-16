@@ -38,7 +38,11 @@ const Profile = () => {
         });
 
         setUser(data);
-        setFormData({ username: data.username, bio: data.bio || "", profilePicture: data.profilePicture });
+        setFormData({
+          username: data.username,
+          bio: data.bio || "",
+          profilePicture: data.profilePicture,
+        });
 
         const followStats = await api.get(`/users/${userId}/follow-stats`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -92,6 +96,10 @@ const Profile = () => {
     navigate("/login");
   };
 
+  const handleGoToFeed = () => {
+    navigate("/feed");
+  };
+
   if (loading) return <h2 className="text-center mt-4">Loading...</h2>;
 
   return (
@@ -106,8 +114,8 @@ const Profile = () => {
           <img
             src={user.profilePicture}
             alt="Profile"
-            className="rounded-circle mb-3 mx-auto d-block" // Centering the image and making it circular
-            style={{ width: "150px", height: "150px", objectFit: "cover" }} // Fixed width and height for circular shape
+            className="rounded-circle mb-3 mx-auto d-block"
+            style={{ width: "150px", height: "150px", objectFit: "cover" }}
             onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
           />
         ) : (
@@ -116,12 +124,15 @@ const Profile = () => {
 
         <p className="mb-3">Bio: {user.bio || "No bio available"}</p>
 
-        <div className="d-flex justify-content-center gap-3">
+        <div className="d-flex justify-content-center gap-3 flex-wrap">
           <button className="btn btn-primary" onClick={() => setEditMode(true)}>
             Edit Profile
           </button>
           <button className="btn btn-danger" onClick={handleLogout}>
             Logout
+          </button>
+          <button className="btn btn-secondary" onClick={handleGoToFeed}>
+            Go to Home
           </button>
         </div>
       </div>

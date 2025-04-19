@@ -108,3 +108,48 @@ exports.getPostById = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+// Add a comment to a post
+exports.addComment = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { text } = req.body;
+
+        if (!text) {
+            return res.status(400).json({ message: "Comment text is required" });
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const newComment = {
+            user: req.user.id,
+            text,
+        };
+
+        post.comments.push(newComment); // Add comment to the post's comments array
+        await post.save();
+
+        res.status(201).json({ message: "Comment added successfully", post });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// Get comments of a post
+exports.getComments = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await Post.findById(postId).populate("comments.user", "username profilePicture");
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.json(post.comments);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};

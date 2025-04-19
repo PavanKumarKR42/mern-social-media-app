@@ -5,6 +5,8 @@ const {
   getPostById,
   likePost,
   deletePost,
+  addComment,       // Import addComment function
+  getComments,      // Import getComments function
 } = require("../controllers/postController");
 const Post = require("../models/Post"); // ✅ Important
 const authMiddleware = require("../middleware/authMiddleware");
@@ -41,5 +43,13 @@ router.put("/like/:postId", authMiddleware, likePost);
 
 // Delete post
 router.delete("/:postId", authMiddleware, deletePost);
+
+// **Comment Routes**
+
+// Add a comment to a post
+router.post("/:postId/comment", authMiddleware, addComment);  // POST route for adding comments
+
+// Get all comments for a specific post
+router.get("/:postId/comment", authMiddleware, getComments); // GET route for fetching comments
 
 module.exports = router;

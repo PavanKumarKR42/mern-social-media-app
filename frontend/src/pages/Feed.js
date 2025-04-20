@@ -113,7 +113,7 @@ const Feed = () => {
     try {
       const token = localStorage.getItem("token");
       await api.post(
-        `/posts/${postId}/comment`,
+        `/posts/${postId}/comments`,
         { text: commentText },
         {
           headers: {
@@ -139,7 +139,7 @@ const Feed = () => {
         </button>
       </div>
 
-      <h2>📸 Latest Posts</h2>
+      <h2 style={styles.heading}>📸 Latest Posts</h2>
 
       <CreatePost onPostCreated={() => fetchPosts(localStorage.getItem("token"))} />
 
@@ -169,15 +169,15 @@ const Feed = () => {
           )}
 
           <p>{post.text}</p>
-          <p style={{ color: "#777", fontSize: "0.8rem" }}>
+          <p style={styles.timestamp}>
             Posted on: {new Date(post.createdAt).toLocaleString()}
           </p>
 
           <div style={styles.actions}>
-            <button onClick={() => handleLike(post._id)}>
+            <button onClick={() => handleLike(post._id)} style={styles.likeBtn}>
               ❤️ {post.likes.length}
             </button>
-            <button onClick={() => toggleComments(post._id)}>
+            <button onClick={() => toggleComments(post._id)} style={styles.commentToggle}>
               💬 {visibleComments[post._id] ? "Hide" : "View"} Comments
             </button>
             {currentUserId === post.user._id && (
@@ -195,7 +195,7 @@ const Feed = () => {
                     <div>
                       <strong>{comment.user?.username || "User"}:</strong> {comment.text}
                     </div>
-                    <div style={{ color: "#888", fontSize: "0.75rem" }}>
+                    <div style={styles.commentTimestamp}>
                       {new Date(comment.createdAt).toLocaleString()}
                     </div>
                   </div>
@@ -232,7 +232,7 @@ const styles = {
     padding: "20px",
     maxWidth: "600px",
     margin: "auto",
-    backgroundColor: "#f3f4f6", // Light gray background for the whole feed
+    backgroundColor: "#F5F5DC", // Light Beige
     minHeight: "100vh",
     borderRadius: "10px",
   },
@@ -242,7 +242,7 @@ const styles = {
     marginBottom: "10px",
   },
   profileBtn: {
-    background: "#4f46e5", // Indigo
+    background: "#E2725B", // Terracotta Red
     color: "white",
     border: "none",
     borderRadius: "5px",
@@ -250,13 +250,16 @@ const styles = {
     cursor: "pointer",
     fontSize: "0.9rem",
   },
+  heading: {
+    color: "#5E8B7E", // Muted Teal
+  },
   post: {
-    backgroundColor: "#ffffff", // White for posts
-    border: "1px solid #e5e7eb", // Light border
+    backgroundColor: "#ffffff",
+    border: "1px solid #ddd",
     padding: "15px",
     borderRadius: "8px",
     marginBottom: "20px",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
   },
   userInfo: {
     display: "flex",
@@ -272,62 +275,86 @@ const styles = {
     objectFit: "cover",
   },
   username: {
-    color: "#1f2937", // Darker text
+    color: "#333",
   },
   postImage: {
     maxWidth: "100%",
     borderRadius: "6px",
     marginTop: "10px",
   },
+  timestamp: {
+    color: "#777",
+    fontSize: "0.8rem",
+  },
   actions: {
     marginTop: "10px",
     display: "flex",
     gap: "10px",
   },
+  likeBtn: {
+    background: "#E2725B",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    padding: "6px 10px",
+    cursor: "pointer",
+  },
+  commentToggle: {
+    background: "#5E8B7E",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    padding: "6px 10px",
+    cursor: "pointer",
+  },
   delete: {
     background: "transparent",
-    color: "#dc2626", // Red
-    border: "none",
-    cursor: "pointer",
+    color: "#E2725B",
+    border: "1px solid #E2725B",
+    borderRadius: "5px",
+    padding: "6px 10px",
     marginLeft: "auto",
+    cursor: "pointer",
   },
   comments: {
     marginTop: "10px",
-    borderTop: "1px solid #e5e7eb",
+    borderTop: "1px solid #ccc",
     paddingTop: "10px",
-    backgroundColor: "#f9fafb", // Lightest gray for comments section
+    backgroundColor: "#f9f9f9",
     borderRadius: "6px",
   },
   comment: {
     marginBottom: "8px",
-    padding: "5px 10px",
-    backgroundColor: "#f3f4f6", // Light gray for each comment
+    padding: "8px 10px",
+    backgroundColor: "#f0f0f0",
     borderRadius: "4px",
+  },
+  commentTimestamp: {
+    color: "#888",
+    fontSize: "0.75rem",
   },
   commentInputWrapper: {
     display: "flex",
     justifyContent: "flex-start",
     gap: "10px",
+    marginTop: "10px",
   },
   commentInput: {
     width: "calc(100% - 120px)",
     padding: "10px",
-    marginTop: "10px",
     borderRadius: "6px",
-    border: "1px solid #d1d5db",
-    backgroundColor: "#ffffff",
+    border: "1px solid #ccc",
+    backgroundColor: "#fff",
   },
   commentButton: {
-    background: "#4f46e5", // Indigo
+    background: "#5E8B7E",
     color: "white",
     border: "none",
     borderRadius: "5px",
     padding: "8px 12px",
     cursor: "pointer",
     fontSize: "1rem",
-    marginTop: "10px",
   },
 };
-
 
 export default Feed;

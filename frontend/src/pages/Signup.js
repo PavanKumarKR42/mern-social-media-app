@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api.js"; 
+import api from "../utils/api.js";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import backgroundImage from "../images/image.png"; // ✅ Import background image
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -15,87 +16,97 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await api.post("/auth/register", { username, email, password }, {
-        headers: { "Content-Type": "application/json" }
-      });
+      const { data } = await api.post(
+        "/auth/register",
+        { username, email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
       localStorage.setItem("token", data.token);
       toast.success("Signup successful! Redirecting...");
-      setTimeout(() => navigate("/profile"), 1500); // Redirect to Profile page
+      setTimeout(() => navigate("/profile"), 1500);
     } catch (error) {
       console.error("Signup Error:", error.response?.data);
       toast.error(error.response?.data?.message || "Signup failed");
     }
   };
-  
 
   return (
-    <div style={darkMode ? styles.darkContainer : styles.lightContainer}>
-      <button style={styles.toggleButton} onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
-      </button>
-      <h2 style={styles.heading}>Sign Up</h2>
-      <form onSubmit={handleSignup} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          style={styles.input}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={styles.input}
-        />
-        
-        {/* Password Field with Eye Icon */}
-        <div style={styles.passwordContainer}>
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={styles.passwordInput}
-          />
-          <span onClick={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-            {showPassword ? "👁️" : "🙈"}
-          </span>
-        </div>
+    <div
+      style={{
+        ...styles.container,
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        color: darkMode ? "#fff" : "#333",
+      }}
+    >
+      <div style={{ ...styles.overlay, backgroundColor: darkMode ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.7)" }}>
+        <button style={styles.toggleButton} onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
+        </button>
 
-        <button type="submit" style={styles.button}>Sign Up</button>
-      </form>
+        <h2 style={styles.heading}>Sign Up</h2>
+
+        <form onSubmit={handleSignup} style={styles.form}>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            style={styles.input}
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={styles.input}
+          />
+
+          <div style={styles.passwordContainer}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={styles.passwordInput}
+            />
+            <span onClick={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              {showPassword ? "👁️" : "🙈"}
+            </span>
+          </div>
+
+          <button type="submit" style={styles.button}>Sign Up</button>
+        </form>
+      </div>
     </div>
   );
 };
 
 const styles = {
-  lightContainer: {
+  container: {
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     height: "100vh",
-    backgroundColor: "#f4f4f4",
-    color: "#333",
-    transition: "background 0.3s",
+    position: "relative",
   },
-  darkContainer: {
+  overlay: {
+    padding: "40px",
+    borderRadius: "12px",
+    boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+    backdropFilter: "blur(5px)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    backgroundColor: "#222",
-    color: "#fff",
-    transition: "background 0.3s",
   },
   heading: {
-    fontSize: "24px",
+    fontSize: "28px",
     marginBottom: "20px",
   },
   form: {
@@ -103,10 +114,6 @@ const styles = {
     flexDirection: "column",
     gap: "15px",
     width: "300px",
-    padding: "20px",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
   },
   input: {
     padding: "10px",
@@ -161,5 +168,3 @@ const styles = {
 };
 
 export default Signup;
-
-

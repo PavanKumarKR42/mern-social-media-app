@@ -103,10 +103,10 @@ const Profile = () => {
   if (loading) return <h2 className="text-center mt-4">Loading...</h2>;
 
   return (
-    <div className="container mt-5 text-center">
-      <div className="card p-4 shadow">
-        <h2>{user.username}'s Profile</h2>
-        <p className="text-muted">Email: {user.email}</p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.heading}>{user.username}'s Profile</h2>
+        <p style={styles.subText}>Email: {user.email}</p>
         <p>Followers: {stats.followersCount}</p>
         <p>Following: {stats.followingCount}</p>
 
@@ -114,8 +114,7 @@ const Profile = () => {
           <img
             src={user.profilePicture}
             alt="Profile"
-            className="rounded-circle mb-3 mx-auto d-block"
-            style={{ width: "150px", height: "150px", objectFit: "cover" }}
+            style={styles.profileImage}
             onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
           />
         ) : (
@@ -124,30 +123,30 @@ const Profile = () => {
 
         <p className="mb-3">Bio: {user.bio || "No bio available"}</p>
 
-        <div className="d-flex justify-content-center gap-3 flex-wrap">
-          <button className="btn btn-primary" onClick={() => setEditMode(true)}>
+        <div style={styles.buttonGroup}>
+          <button style={{ ...styles.button, ...styles.primary }} onClick={() => setEditMode(true)}>
             Edit Profile
           </button>
-          <button className="btn btn-danger" onClick={handleLogout}>
+          <button style={{ ...styles.button, ...styles.danger }} onClick={handleLogout}>
             Logout
           </button>
-          <button className="btn btn-secondary" onClick={handleGoToFeed}>
+          <button style={{ ...styles.button, ...styles.secondary }} onClick={handleGoToFeed}>
             Go to Home
           </button>
         </div>
       </div>
 
       {editMode && (
-        <div className="modal-dialog mt-4">
-          <div className="modal-content p-4 shadow-sm">
-            <h4>Edit Profile</h4>
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
+            <h4 style={styles.heading}>Edit Profile</h4>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleChange}
               placeholder="Username"
-              className="form-control my-2"
+              style={styles.input}
             />
             <input
               type="text"
@@ -155,21 +154,21 @@ const Profile = () => {
               value={formData.bio}
               onChange={handleChange}
               placeholder="Bio"
-              className="form-control my-2"
+              style={styles.input}
             />
             <input
               type="file"
               name="profilePicture"
               accept="image/*"
               onChange={handleFileChange}
-              className="form-control my-2"
+              style={styles.input}
             />
 
-            <div className="d-flex justify-content-end gap-2">
-              <button className="btn btn-success" onClick={handleUpdate}>
+            <div style={styles.buttonGroup}>
+              <button style={{ ...styles.button, ...styles.success }} onClick={handleUpdate}>
                 Save
               </button>
-              <button className="btn btn-secondary" onClick={() => setEditMode(false)}>
+              <button style={{ ...styles.button, ...styles.secondary }} onClick={() => setEditMode(false)}>
                 Cancel
               </button>
             </div>
@@ -178,6 +177,87 @@ const Profile = () => {
       )}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    backgroundColor: "#F5F5DC", // Light Beige
+    padding: "30px",
+    minHeight: "100vh",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    padding: "30px",
+    borderRadius: "12px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    maxWidth: "600px",
+    margin: "0 auto",
+    textAlign: "center",
+  },
+  heading: {
+    color: "#5E8B7E", // Muted Teal
+  },
+  subText: {
+    color: "#555",
+    marginBottom: "10px",
+  },
+  profileImage: {
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    marginBottom: "15px",
+  },
+  buttonGroup: {
+    display: "flex",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: "10px",
+    marginTop: "20px",
+  },
+  button: {
+    padding: "10px 16px",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "1rem",
+    cursor: "pointer",
+  },
+  primary: {
+    backgroundColor: "#5E8B7E",
+    color: "white",
+  },
+  secondary: {
+    backgroundColor: "#ccc",
+    color: "#333",
+  },
+  danger: {
+    backgroundColor: "#E2725B", // Terracotta Red
+    color: "white",
+  },
+  success: {
+    backgroundColor: "#5E8B7E", // Reusing teal for save
+    color: "white",
+  },
+  modal: {
+    marginTop: "30px",
+    display: "flex",
+    justifyContent: "center",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "8px",
+    width: "100%",
+    maxWidth: "500px",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+  },
+  input: {
+    margin: "10px 0",
+    padding: "10px",
+    width: "100%",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+  },
 };
 
 export default Profile;

@@ -47,9 +47,9 @@ router.delete("/:postId", authMiddleware, deletePost);
 // **Comment Routes**
 
 // Add a comment to a post
-router.post("/:postId/comment", authMiddleware, addComment);  // POST route for adding comments
+router.post("/:postId/comments", authMiddleware, addComment);  // POST route for adding comments
 
 // Get all comments for a specific post
-router.get("/:postId/comment", authMiddleware, getComments); // GET route for fetching comments
+router.get("/:postId/comments", authMiddleware, getComments); // GET route for fetching comments
 
 module.exports = router;

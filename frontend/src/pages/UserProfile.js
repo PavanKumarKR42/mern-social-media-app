@@ -18,6 +18,12 @@ const UserProfile = () => {
   const [showFollowing, setShowFollowing] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const colors = {
+    terracotta: "#E2725B",
+    beige: "#F5F5DC",
+    teal: "#5E8B7E",
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -107,14 +113,20 @@ const UserProfile = () => {
     navigate("/feed");
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
 
   return (
-    <div className="container mt-4 position-relative">
-      {/* Go to Feed Button */}
+    <div style={{ backgroundColor: colors.beige, minHeight: "100vh", padding: "2rem" }}>
       <button
-        className="btn btn-dark position-absolute"
-        style={{ top: "10px", right: "10px", zIndex: 1000 }}
+        className="btn"
+        style={{
+          backgroundColor: colors.teal,
+          color: "#fff",
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 1000,
+        }}
         onClick={handleGoToFeed}
       >
         Go to Feed
@@ -130,20 +142,26 @@ const UserProfile = () => {
             height: "150px",
             objectFit: "cover",
             cursor: "pointer",
+            border: `4px solid ${colors.teal}`,
           }}
           onClick={() => setShowModal(true)}
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/150";
           }}
         />
-        <h2>{user.username}</h2>
-        <p>{user.email}</p>
+        <h2 style={{ color: colors.terracotta }}>{user.username}</h2>
+        <p style={{ color: colors.teal }}>{user.email}</p>
 
         {currentUserId !== user._id && (
           <button
             onClick={handleFollowToggle}
             disabled={isProcessing}
-            className={`btn ${isFollowing ? "btn-secondary" : "btn-primary"} mt-2`}
+            className="btn mt-2"
+            style={{
+              backgroundColor: isFollowing ? "#aaa" : colors.terracotta,
+              color: "#fff",
+              border: "none",
+            }}
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </button>
@@ -152,94 +170,90 @@ const UserProfile = () => {
         <div className="mt-3">
           <button
             className="btn btn-link"
+            style={{ color: colors.terracotta }}
             onClick={() => setShowFollowers(!showFollowers)}
           >
             Followers ({followers.length})
           </button>
           <button
-            className="btn btn-link ml-3"
+            className="btn btn-link"
+            style={{ color: colors.teal }}
             onClick={() => setShowFollowing(!showFollowing)}
           >
             Following ({following.length})
           </button>
         </div>
 
-        {/* Followers Section */}
+        {/* Followers */}
         {showFollowers && (
-  <div className="mt-3">
-    <h4>Followers</h4>
-    {followers.length > 0 ? (
-      <div className="d-flex flex-column align-items-center gap-3">
-        {followers.map((follower) => (
-          <div
-            key={follower._id}
-            className="card p-2 d-flex flex-row align-items-center"
-            style={{
-              width: "300px",
-              borderRadius: "10px",
-              gap: "15px",
-            }}
-          >
-            <img
-              src={follower.profilePicture || "https://via.placeholder.com/50"}
-              alt="Follower"
-              className="rounded-circle"
-              style={{ width: "50px", height: "50px", objectFit: "cover" }}
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/50";
-              }}
-            />
-            <p className="mb-0">{follower.username}</p>
+          <div className="mt-3">
+            <h4 style={{ color: colors.terracotta }}>Followers</h4>
+            {followers.length > 0 ? (
+              <div className="d-flex flex-column align-items-center gap-3">
+                {followers.map((f) => (
+                  <div
+                    key={f._id}
+                    className="card p-2 d-flex flex-row align-items-center"
+                    style={{
+                      width: "300px",
+                      borderRadius: "10px",
+                      gap: "15px",
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <img
+                      src={f.profilePicture || "https://via.placeholder.com/50"}
+                      alt="Follower"
+                      className="rounded-circle"
+                      style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                    />
+                    <p className="mb-0">{f.username}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No followers yet.</p>
+            )}
           </div>
-        ))}
-      </div>
-    ) : (
-      <p>No followers yet.</p>
-    )}
-  </div>
-)}
+        )}
 
-
-        {/* Following Section */}
+        {/* Following */}
         {showFollowing && (
-  <div className="mt-3">
-    <h4>Following</h4>
-    {following.length > 0 ? (
-      <div className="d-flex flex-column align-items-center gap-3">
-        {following.map((followee) => (
-          <div
-            key={followee._id}
-            className="card p-2 d-flex flex-row align-items-center"
-            style={{
-              width: "300px",
-              borderRadius: "10px",
-              gap: "15px",
-            }}
-          >
-            <img
-              src={followee.profilePicture || "https://via.placeholder.com/50"}
-              alt="Following"
-              className="rounded-circle"
-              style={{ width: "50px", height: "50px", objectFit: "cover" }}
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/50";
-              }}
-            />
-            <p className="mb-0">{followee.username}</p>
+          <div className="mt-3">
+            <h4 style={{ color: colors.teal }}>Following</h4>
+            {following.length > 0 ? (
+              <div className="d-flex flex-column align-items-center gap-3">
+                {following.map((f) => (
+                  <div
+                    key={f._id}
+                    className="card p-2 d-flex flex-row align-items-center"
+                    style={{
+                      width: "300px",
+                      borderRadius: "10px",
+                      gap: "15px",
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <img
+                      src={f.profilePicture || "https://via.placeholder.com/50"}
+                      alt="Following"
+                      className="rounded-circle"
+                      style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                    />
+                    <p className="mb-0">{f.username}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>Not following anyone yet.</p>
+            )}
           </div>
-        ))}
-      </div>
-    ) : (
-      <p>Not following anyone yet.</p>
-    )}
-  </div>
-)}
-
+        )}
       </div>
 
-      {/* Posts Section */}
+      {/* Posts */}
       <div className="text-center mb-3">
-        <h3>Posts</h3>
+        <h3 style={{ color: colors.terracotta }}>Posts</h3>
       </div>
 
       {posts.length > 0 ? (
@@ -247,22 +261,14 @@ const UserProfile = () => {
           <div
             key={post._id}
             className="card mb-3"
-            style={{ maxWidth: "500px", margin: "auto" }}
+            style={{ maxWidth: "500px", margin: "auto", backgroundColor: "#fff" }}
           >
             {post.image && (
               <img
                 src={post.image}
                 alt="post"
                 className="card-img-top"
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  objectFit: "cover",
-                  maxHeight: "300px",
-                }}
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                style={{ maxHeight: "300px", objectFit: "cover" }}
               />
             )}
             <div className="card-body">
@@ -274,7 +280,7 @@ const UserProfile = () => {
         <p className="text-center">No posts yet.</p>
       )}
 
-      {/* === Modal Popup for Full Size Profile Picture === */}
+      {/* Modal Full-Size Profile Picture */}
       {showModal && (
         <div
           className="modal-backdrop"
@@ -295,13 +301,11 @@ const UserProfile = () => {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              position: "relative",
               background: "#fff",
               padding: "10px",
               borderRadius: "10px",
               maxWidth: "90vw",
               maxHeight: "90vh",
-              overflow: "auto",
             }}
           >
             <button
@@ -328,9 +332,6 @@ const UserProfile = () => {
                 maxHeight: "80vh",
                 objectFit: "contain",
                 borderRadius: "10px",
-              }}
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/500";
               }}
             />
           </div>

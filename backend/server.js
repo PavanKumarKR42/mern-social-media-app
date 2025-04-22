@@ -13,7 +13,7 @@ app.use(express.json());
 // CORS Configuration
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://44.202.134.172:3000"], // Add the allowed origins here
+    origin: ["http://localhost:3000", "http://54.167.85.71/:3000"], // Add the allowed origins here
     credentials: true, // Allow cookies and credentials to be sent
   })
 );

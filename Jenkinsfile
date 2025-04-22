@@ -22,14 +22,15 @@ pipeline {
             steps {
                 script {
                     echo 'Checking and stopping container using port 3000...'
-                    bat '''
-                    @echo off
-                    for /F "tokens=*" %%i in ('docker ps -q --filter "publish=3000"') do (
-                        echo Stopping container using port 3000...
-                        docker stop %%i
-                        docker rm %%i
-                    )
-                    exit /b 0
+                    sh '''
+                    CONTAINER_ID=$(docker ps -q --filter "publish=3000")
+                    if [ ! -z "$CONTAINER_ID" ]; then
+                        echo "Stopping container using port 3000..."
+                        docker stop $CONTAINER_ID
+                        docker rm $CONTAINER_ID
+                    else
+                        echo "No container using port 3000."
+                    fi
                     '''
                 }
             }
@@ -38,8 +39,8 @@ pipeline {
         stage('Build & Run Containers') {
             steps {
                 script {
-                    bat 'docker-compose down || exit 0'
-                    bat 'docker-compose up --build -d'
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up --build -d'
                 }
             }
         }
@@ -48,8 +49,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up unused Docker resources...'
-            bat 'docker system prune -f'
+            sh 'docker system prune -f'
         }
     }
 }
-

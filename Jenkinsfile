@@ -46,10 +46,13 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo 'Cleaning up unused Docker resources...'
-            sh 'docker system prune -f'
-        }
+   post {
+  always {
+    node {
+      echo 'Cleaning up unused Docker resources...'
+      sh 'docker system prune -af'
     }
+  }
+}
+
 }

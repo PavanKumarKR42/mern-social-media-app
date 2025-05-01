@@ -139,7 +139,7 @@ const Feed = () => {
         </button>
       </div>
 
-      <h2 style={styles.heading}>📸 Home Posts</h2>
+      <h2 style={styles.heading}>📸  Posts</h2>
 
       <CreatePost onPostCreated={() => fetchPosts(localStorage.getItem("token"))} />
 

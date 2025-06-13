@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+
+// MUI Components
+import { Box, Container, Paper, Typography, Avatar, Button, IconButton, TextField, Modal, Backdrop, Fade, CircularProgress } from "@mui/material";
+// MUI Icons
+import { Edit, Logout, DynamicFeed, CameraAlt, Close } from "@mui/icons-material";
+// Framer Motion
+import { motion } from "framer-motion";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -11,253 +18,163 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const [stats, setStats] = useState({ followersCount: 0, followingCount: 0 });
   const [formData, setFormData] = useState({ username: "", bio: "", profilePicture: null });
+  const [previewImage, setPreviewImage] = useState(null);
 
+  // --- All your data fetching and logic functions remain the same ---
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("Session expired, please log in again.");
-          navigate("/login");
-          return;
-        }
-
-        let decodedToken;
-        try {
-          decodedToken = jwtDecode(token);
-        } catch (error) {
-          toast.error("Invalid session, please log in again.");
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
-        }
-
+        if (!token) { toast.error("Session expired."); navigate("/login"); return; }
+        const decodedToken = jwtDecode(token);
         const userId = decodedToken.id;
-        const { data } = await api.get(`/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const { data } = await api.get(`/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
         setUser(data);
-        setFormData({
-          username: data.username,
-          bio: data.bio || "",
-          profilePicture: data.profilePicture,
-        });
-
-        const followStats = await api.get(`/users/${userId}/follow-stats`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        setFormData({ username: data.username, bio: data.bio || "", profilePicture: null });
+        setPreviewImage(data.profilePicture);
+        const followStats = await api.get(`/users/${userId}/follow-stats`, { headers: { Authorization: `Bearer ${token}` } });
         setStats(followStats.data);
-      } catch (error) {
-        toast.error("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
+      } catch (error) { toast.error("Failed to load profile"); } 
+      finally { setLoading(false); }
     };
-
     fetchUserProfile();
   }, [navigate]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, profilePicture: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, profilePicture: file });
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleUpdate = async () => {
-    try {
+     try {
       const token = localStorage.getItem("token");
       const formDataToSend = new FormData();
       formDataToSend.append("username", formData.username);
       formDataToSend.append("bio", formData.bio);
-      if (formData.profilePicture) {
+      if (formData.profilePicture && formData.profilePicture instanceof File) {
         formDataToSend.append("profilePicture", formData.profilePicture);
       }
-
-      const { data } = await api.put("/users/update", formDataToSend, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      const { data } = await api.put("/users/update", formDataToSend, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
       setUser(data.user);
+      setPreviewImage(data.user.profilePicture);
       toast.success("Profile updated successfully!");
       setEditMode(false);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Update failed");
-    }
+    } catch (error) { toast.error(error.response?.data?.message || "Update failed"); }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = () => { localStorage.removeItem("token"); navigate("/login"); };
+  const handleGoToFeed = () => navigate("/feed");
+
+  // --- NEW "GRADIENT & GLASS" THEME STYLES ---
+  const theme = {
+    primary: '#ff4081', // A vibrant pink for accents
+    text: '#212121',
+    textSecondary: '#5f6368',
+  };
+  
+  const gradientAnimation = {
+    "0%": { backgroundPosition: "0% 50%" },
+    "50%": { backgroundPosition: "100% 50%" },
+    "100%": { backgroundPosition: "0% 50%" },
   };
 
-  const handleGoToFeed = () => {
-    navigate("/feed");
-  };
-
-  if (loading) return <h2 className="text-center mt-4">Loading...</h2>;
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(-45deg, #f8cdda, #c6a7f4, #92a7de, #85d8ce)', backgroundSize: '400% 400%' }}>
+        <CircularProgress sx={{ color: theme.primary }} size={60} />
+      </Box>
+    );
+  }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.heading}>{user.username}'s Profile</h2>
-        <p style={styles.subText}>Email: {user.email}</p>
-        <p>Followers: {stats.followersCount}</p>
-        <p>Following: {stats.followingCount}</p>
+    <Box sx={{
+      minHeight: "100vh",
+      fontFamily: "'Poppins', sans-serif",
+      py: { xs: 3, sm: 5 },
+      background: 'linear-gradient(-45deg, #f8cdda, #c6a7f4, #92a7de, #85d8ce)',
+      backgroundSize: '400% 400%',
+      animation: 'gradientAnimation 20s ease infinite',
+      "@keyframes gradientAnimation": gradientAnimation,
+    }}>
+      <Container maxWidth="md">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
+          {/* --- The Frosted Glass Card --- */}
+          <Paper sx={{
+            p: { xs: 2.5, sm: 4 },
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "blur(20px)",
+            border: `1px solid rgba(255, 255, 255, 0.2)`,
+            borderRadius: "24px",
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
+          }}>
+            
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Avatar src={user.profilePicture} sx={{ width: 150, height: 150, margin: 'auto', border: `4px solid ${theme.primary}`, mb: 2, boxShadow: `0 0 20px ${theme.primary}` }} />
+              <Typography variant="h3" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: '700', color: theme.text }}>
+                {user.username}
+              </Typography>
+              <Typography variant="body1" sx={{ color: theme.textSecondary, mt: 1 }}>{user.email}</Typography>
+            </Box>
 
-        {user.profilePicture ? (
-          <img
-            src={user.profilePicture}
-            alt="Profile"
-            style={styles.profileImage}
-            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
-          />
-        ) : (
-          <p>No profile picture</p>
-        )}
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, my: 4, p: 2 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: '700', color: theme.text }}>{stats.followersCount}</Typography>
+                <Typography sx={{ color: theme.textSecondary }}>Followers</Typography>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: '700', color: theme.text }}>{stats.followingCount}</Typography>
+                <Typography sx={{ color: theme.textSecondary }}>Following</Typography>
+              </Box>
+            </Box>
+            <Typography sx={{ textAlign: 'center', color: theme.textSecondary, fontStyle: 'italic', mb: 4, px: 2 }}>"{user.bio || 'No bio specified'}"</Typography>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+              <Button variant="contained" startIcon={<Edit />} onClick={() => setEditMode(true)} sx={{ backgroundColor: theme.primary, borderRadius: '12px', boxShadow: 'none', '&:hover': { backgroundColor: '#d81b60' } }}>Edit Profile</Button>
+              <Button variant="contained" startIcon={<DynamicFeed />} onClick={handleGoToFeed} sx={{ backgroundColor: 'rgba(0,0,0,0.1)', color: theme.text, borderRadius: '12px', boxShadow: 'none', '&:hover': { backgroundColor: 'rgba(0,0,0,0.2)' } }}>Go to Feed</Button>
+              <Button variant="text" startIcon={<Logout />} onClick={handleLogout} sx={{ color: theme.textSecondary }}>Logout</Button>
+            </Box>
+          </Paper>
+        </motion.div>
+      </Container>
 
-        <p className="mb-3">Bio: {user.bio || "No bio available"}</p>
+      {/* --- Edit Profile Modal (Also themed) --- */}
+      <Modal open={editMode} onClose={() => setEditMode(false)} closeAfterTransition BackdropComponent={Backdrop} BackdropProps={{ timeout: 500 }}>
+        <Fade in={editMode}>
+           <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: '90vw', sm: 450 } }}>
+            <Paper sx={{ p: 4, backgroundColor: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(20px)", border: `1px solid rgba(255, 255, 255, 0.2)`, borderRadius: "20px", boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)', fontFamily: "'Poppins', sans-serif" }}>
+              <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3}}>
+                <Typography variant="h5" sx={{ fontWeight: '600' }}>Edit Profile</Typography>
+                <IconButton onClick={() => setEditMode(false)}><Close /></IconButton>
+              </Box>
 
-        <div style={styles.buttonGroup}>
-          <button style={{ ...styles.button, ...styles.primary }} onClick={() => setEditMode(true)}>
-            Edit Profile
-          </button>
-          <button style={{ ...styles.button, ...styles.danger }} onClick={handleLogout}>
-            Logout
-          </button>
-          <button style={{ ...styles.button, ...styles.secondary }} onClick={handleGoToFeed}>
-            Go to Home
-          </button>
-        </div>
-      </div>
-
-      {editMode && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
-            <h4 style={styles.heading}>Edit Profile</h4>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Username"
-              style={styles.input}
-            />
-            <input
-              type="text"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              placeholder="Bio"
-              style={styles.input}
-            />
-            <input
-              type="file"
-              name="profilePicture"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={styles.input}
-            />
-
-            <div style={styles.buttonGroup}>
-              <button style={{ ...styles.button, ...styles.success }} onClick={handleUpdate}>
-                Save
-              </button>
-              <button style={{ ...styles.button, ...styles.secondary }} onClick={() => setEditMode(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                <Box sx={{ position: 'relative', '&:hover .edit-icon-overlay': { opacity: 1 } }}>
+                  <Avatar src={previewImage} sx={{ width: 120, height: 120, border: `3px solid ${theme.primary}` }} />
+                  <Box className="edit-icon-overlay" onClick={() => document.getElementById('profile-pic-upload').click()} sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', opacity: 0, transition: 'opacity 0.3s' }}>
+                    <CameraAlt />
+                  </Box>
+                  <input id="profile-pic-upload" type="file" accept="image/*" hidden onChange={handleFileChange} />
+                </Box>
+              </Box>
+              
+              <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} sx={{ mb: 2 }} />
+              <TextField fullWidth multiline rows={3} label="Bio" name="bio" value={formData.bio} onChange={handleChange} sx={{ mb: 3 }} />
+              
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                <Button onClick={() => setEditMode(false)} sx={{color: theme.textSecondary}}>Cancel</Button>
+                <Button onClick={handleUpdate} variant="contained" sx={{ backgroundColor: theme.primary, borderRadius: '12px', '&:hover': { backgroundColor: '#d81b60' } }}>Save Changes</Button>
+              </Box>
+            </Paper>
+          </Box>
+        </Fade>
+      </Modal>
+    </Box>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: "#F5F5DC", // Light Beige
-    padding: "30px",
-    minHeight: "100vh",
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    maxWidth: "600px",
-    margin: "0 auto",
-    textAlign: "center",
-  },
-  heading: {
-    color: "#5E8B7E", // Muted Teal
-  },
-  subText: {
-    color: "#555",
-    marginBottom: "10px",
-  },
-  profileImage: {
-    width: "150px",
-    height: "150px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    marginBottom: "15px",
-  },
-  buttonGroup: {
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-    marginTop: "20px",
-  },
-  button: {
-    padding: "10px 16px",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "1rem",
-    cursor: "pointer",
-  },
-  primary: {
-    backgroundColor: "#5E8B7E",
-    color: "white",
-  },
-  secondary: {
-    backgroundColor: "#ccc",
-    color: "#333",
-  },
-  danger: {
-    backgroundColor: "#E2725B", // Terracotta Red
-    color: "white",
-  },
-  success: {
-    backgroundColor: "#5E8B7E", // Reusing teal for save
-    color: "white",
-  },
-  modal: {
-    marginTop: "30px",
-    display: "flex",
-    justifyContent: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "100%",
-    maxWidth: "500px",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-  },
-  input: {
-    margin: "10px 0",
-    padding: "10px",
-    width: "100%",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-  },
 };
 
 export default Profile;

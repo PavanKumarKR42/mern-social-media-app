@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Comment schema for each post
 const commentSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     text: { type: String, required: true },
@@ -10,9 +9,9 @@ const commentSchema = new mongoose.Schema({
 const postSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     text: { type: String, required: true },
-    image: { type: String }, // Cloudinary image URL
+    image: { type: String }, 
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    comments: [commentSchema],  // Add the comments array
+    comments: [commentSchema],  
     createdAt: { type: Date, default: Date.now },
 });
 

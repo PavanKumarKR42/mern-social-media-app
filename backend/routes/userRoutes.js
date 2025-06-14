@@ -8,7 +8,8 @@ const {
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 const {uploadProfilePicture} = require("../middleware/uploadMiddleware"); // ✅ Import upload middleware
-const cloudinary = require("../utils/cloudinary"); // ✅ Import Cloudinary
+// You no longer need to import cloudinary here as the middleware handles it all
+// const cloudinary = require("../utils/cloudinary"); 
 
 const router = express.Router();
 
@@ -36,10 +37,11 @@ router.put("/update", authMiddleware, uploadProfilePicture.single("profilePictur
       if (username) user.username = username;
       if (bio) user.bio = bio;
 
-      // ✅ Correct Cloudinary URL assignment
+      // --- CORRECTED SECTION ---
+      // The `uploadProfilePicture` middleware has already uploaded the file.
+      // The secure Cloudinary URL is now available directly on `req.file.path`.
       if (req.file) {
-          const result = await cloudinary.uploader.upload(req.file.path); // Upload to Cloudinary
-          user.profilePicture = result.secure_url; // Store the secure Cloudinary URL
+          user.profilePicture = req.file.path; // Assign the URL directly
       }
 
       await user.save();
@@ -55,9 +57,10 @@ router.put("/follow/:userId", authMiddleware, followUser);
 
 // ✅ Unfollow a user
 router.put("/unfollow/:userId", authMiddleware, unfollowUser);
+
 router.get("/search", async (req, res) => {
   try {
-      const { username } = req.query; // ✅ Fix this
+      const { username } = req.query; 
       if (!username) {
           return res.status(400).json({ message: "Search query is required" });
       }
@@ -89,7 +92,6 @@ router.get("/:userId/followers", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Fetch Following List (Place it here)
 router.get("/:userId/following", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId)
@@ -115,7 +117,7 @@ router.get("/:userId/follow-stats", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-// ✅ Get a specific user's profile
+
 router.get("/:userId", authMiddleware, async (req, res) => {
   try {
     console.log("Fetching user with ID:", req.params.userId); // Debugging
@@ -129,6 +131,5 @@ router.get("/:userId", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
 
 module.exports = router;

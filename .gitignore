@@ -103,3 +103,4 @@ docker-compose.override.yml
 *.tar.gz
 *.7z
 *.rar
+.vercel
